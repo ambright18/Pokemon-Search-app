@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        input[type="text"] {
+            padding: 8px;
+            margin-bottom: 10px;
+            width: 200px;
+            font-size: 16px;
+        }
+        button {
+            padding: 8px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .pokemon-container {
+            background-color: turquoise;
+            padding: 20px;
+            margin-top: 20px;
+            width: 50%;
+            margin: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .pokemon-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 300px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border: 10px solid turquoise;
+        }
+        .pokemon-image {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+        .pokemon-name,
+        .pokemon-id {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        #pokemonInfo table {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: auto;
+            width: 100%;
+        }
+        #pokemonInfo th, #pokemonInfo td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        #pokemonInfo th {
+            background-color: #f2f2f2;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .pokemon-container {
+                width: 80%;
+            }
+            .pokemon-card {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Pokémon Search</h1>
+    <input type="text" id="searchInput" placeholder="Enter Pokémon name or ID">
+    <button onclick="searchPokemon()">Search</button>
+    <div class="pokemon-container" id="pokemonInfo">
+        <div class="pokemon-card">
+            <div class="pokemon-name" id="pokemonName"></div>
+            <div class="pokemon-id" id="pokemonId"></div>
+            <img src="" alt="Pokémon Image" id="pokemonImage" class="pokemon-image">
+            <table id="pokemonTable">
+                <tr id="typeRow">
+                    <th>Type</th>
+                    <td id="typeData"></td>
+                </tr>
+                <tr id="hpRow">
+                    <th>HP</th>
+                    <td id="hpData"></td>
+                </tr>
+                <tr id="attackRow">
+                    <th>Attack</th>
+                    <td id="attackData"></td>
+                </tr>
+                <tr id="defenseRow">
+                    <th>Defense</th>
+                    <td id="defenseData"></td>
+                </tr>
+                <tr id="specialAttackRow">
+                    <th>Special Attack</th>
+                    <td id="specialAttackData"></td>
+                </tr>
+                <tr id="specialDefenseRow">
+                    <th>Special Defense</th>
+                    <td id="specialDefenseData"></td>
+                </tr>
+                <tr id="speedRow">
+                    <th>Speed</th>
+                    <td id="speedData"></td>
+                </tr>
+                <tr id="heightRow">
+                    <th>Height</th>
+                    <td id="heightData"></td>
+                </tr>
+                <tr id="weightRow">
+                    <th>Weight</th>
+                    <td id="weightData"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function searchPokemon() {
+            let searchQuery = document.getElementById("searchInput").value.toLowerCase();
+            fetch(`https://pokeapi.co/api/v2/pokemon/${searchQuery}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Pokémon not found!');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayPokemon(data);
+                })
+                .catch(error => {
+                    document.getElementById("typeData").innerText = "";
+                    document.getElementById("hpData").innerText = "";
+                    document.getElementById("attackData").innerText = "";
+                    document.getElementById("defenseData").innerText = "";
+                    document.getElementById("specialAttackData").innerText = "";
+                    document.getElementById("specialDefenseData").innerText = "";
+                    document.getElementById("speedData").innerText = "";
+                    document.getElementById("heightData").innerText = "";
+                    document.getElementById("weightData").innerText = "";
+                    document.getElementById("pokemonImage").src = "";
+                    document.getElementById("pokemonName").innerText = "";
+                    document.getElementById("pokemonId").innerText = "";
+                    document.getElementById("pokemonInfo").innerText = error.message;
+                });
+        }
+
+        function displayPokemon(pokemon) {
+            let types = pokemon.types.map(type => type.type.name).join(', ');
+            document.getElementById("typeData").innerText = types;
+            document.getElementById("hpData").innerText = pokemon.stats[0].base_stat;
+            document.getElementById("attackData").innerText = pokemon.stats[1].base_stat;
+            document.getElementById("defenseData").innerText = pokemon.stats[2].base_stat;
+            document.getElementById("specialAttackData").innerText = pokemon.stats[3].base_stat;
+            document.getElementById("specialDefenseData").innerText = pokemon.stats[4].base_stat;
+            document.getElementById("speedData").innerText = pokemon.stats[5].base_stat;
+            document.getElementById("heightData").innerText = pokemon.height / 10 + "m";
+            document.getElementById("weightData").innerText = pokemon.weight / 10 + "kg";
+            document.getElementById("pokemonImage").src = pokemon.sprites.front_default;
+            document.getElementById("pokemonName").innerText = pokemon.name;
+            document.getElementById("pokemonId").innerText = `ID: ${pokemon.id}`;
+        }
+    </script>
+</body>
+</html>
